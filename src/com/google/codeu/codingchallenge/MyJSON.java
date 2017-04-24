@@ -31,7 +31,6 @@ final class MyJSON implements JSON {
   @Override
   public JSON setObject(String name, JSON value) {
     strings.remove(name);
-    objects.remove(name);
     objects.put(name, value);
     return this;
   }
@@ -43,7 +42,6 @@ final class MyJSON implements JSON {
 
   @Override
   public JSON setString(String name, String value) {
-    strings.remove(name);
     objects.remove(name);
     strings.put(name, value);
     return this;
