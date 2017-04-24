@@ -50,7 +50,7 @@ final class MyJSONParser implements JSONParser {
     index = eatWhitespace(in, index);
     // "{"
     index = eatWhitespace(in, expectedToken(in, index, '{'));
-    if (in.charAt(index) == '}') {
+    if (charAt(in, index) == '}') {
       return new JSONAndIndex(json, eatWhitespace(in, ++index));
     }
     while (index < in.length()) {
@@ -60,11 +60,11 @@ final class MyJSONParser implements JSONParser {
 
       // ":"
       index = eatWhitespace(in, expectedToken(in, index, ':'));
-      if (in.charAt(index) == '\"') {
+      if (charAt(in, index) == '\"') {
         StringAndIndex value = parseString(in, index);
         index = eatWhitespace(in, value.index);
         json.setString(name.value, value.value);
-      } else if (in.charAt(index) == '{') {
+      } else if (charAt(in, index) == '{') {
         JSONAndIndex value = parseObject(in, index);
         index = eatWhitespace(in, value.index);
         json.setObject(name.value, value.value);
@@ -73,10 +73,10 @@ final class MyJSONParser implements JSONParser {
       }
 
       // "," or "}"
-      if (in.charAt(index) == ',') {
+      if (charAt(in, index) == ',') {
         index = eatWhitespace(in, ++index);
         continue;
-      } else if (in.charAt(index) == '}') {
+      } else if (charAt(in, index) == '}') {
         index = eatWhitespace(in, ++index);
         break;
       } else {
@@ -84,6 +84,13 @@ final class MyJSONParser implements JSONParser {
       }
     }
     return new JSONAndIndex(json, index);
+  }
+
+  private char charAt(String s, int index) throws IOException {
+    if (index >= s.length()) {
+      throw new IOException();
+    }
+    return s.charAt(index);
   }
 
   private StringAndIndex parseString(String in, int index) throws IOException {
@@ -100,10 +107,10 @@ final class MyJSONParser implements JSONParser {
           case '\"':
             result.append('\"');
             break;
-          case '\n':
+          case 'n':
             result.append('\n');
             break;
-          case '\t':
+          case 't':
             result.append('\t');
             break;
           default:
@@ -120,7 +127,7 @@ final class MyJSONParser implements JSONParser {
   }
 
   private int expectedToken(String in, int index, char expected) throws IOException {
-    if (in.charAt(index) != expected) {
+    if (charAt(in, index) != expected) {
       throw new IOException();
     }
     return ++index;

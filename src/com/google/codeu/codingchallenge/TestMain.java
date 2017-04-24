@@ -17,6 +17,8 @@ package com.google.codeu.codingchallenge;
 import java.util.Collection;
 import java.util.HashSet;
 
+import java.io.IOException;
+
 final class TestMain {
 
   public static void main(String[] args) {
@@ -41,6 +43,18 @@ final class TestMain {
       }
     });
 
+    tests.add("Whitespace Only", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+        final JSONParser parser = factory.parser();
+        try {
+          parser.parse(" \t  ");
+        } catch (IOException ex) {
+          // expected
+        }
+      }
+    });
+
     tests.add("String Value", new Test() {
       @Override
       public void run(JSONFactory factory) throws Exception {
@@ -49,6 +63,20 @@ final class TestMain {
 
         Asserts.isEqual("sam doe", obj.getString("name"));
      }
+    });
+
+    tests.add("Double value error", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+        final JSONParser parser = factory.parser();
+        try {
+          parser.parse("{ \"name\":\"sam doe\" \"error\"}");
+          Asserts.isTrue(false, "Exception should be caught");
+
+        } catch (IOException ex) {
+          // expected
+        }
+      }
     });
 
     tests.add("Object Value", new Test() {
@@ -63,6 +91,212 @@ final class TestMain {
         Asserts.isNotNull(nameObj);
         Asserts.isEqual("sam", nameObj.getString("first"));
         Asserts.isEqual("doe", nameObj.getString("last"));
+      }
+    });
+
+    tests.add("Object Value extra comma", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        try {
+          parser.parse("{ \"name\":{\"first\":\"sam\", \"last\":\"doe\", } }");
+        } catch (IOException ex) {
+          // expected
+        }
+      }
+    });
+
+    tests.add("Object Value Extra Bracket", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        try {
+          parser.parse("{ \"name\":{{\"first\":\"sam\", \"last\":\"doe\" } }");
+        } catch (IOException ex) {
+          // expected
+        }
+      }
+    });
+
+    tests.add("Object Value extra colon", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        try {
+          parser.parse("{ \"name\":{\"first\"::\"sam\", \"last\":\"doe\" } }");
+        } catch (IOException ex) {
+          // expected
+        }
+      }
+    });
+
+    tests.add("Object Value extra closing bracket", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        try {
+          parser.parse("{ \"name\":{\"first\":\"sam\", \"last\":\"doe\" }} }");
+        } catch (IOException ex) {
+          // expected
+        }
+      }
+    });
+
+    tests.add("Object Value missing closing bracket", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        try {
+          parser.parse("{ \"name\":{\"first\":\"sam\", \"last\":\"doe\"  }");
+        } catch (IOException ex) {
+          // expected
+        }
+      }
+    });
+
+    tests.add("Object Value single bracket", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        try {
+          parser.parse("{");
+        } catch (IOException ex) {
+          // expected
+        }
+      }
+    });
+
+    tests.add("Object Value Missing Quotation mark", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        try {
+          parser.parse("{ \"name\":{\"first:\"sam\", \"last\":\"doe\" } }");
+        } catch (IOException ex) {
+          // expected
+        }
+      }
+    });
+
+    tests.add("Object Value Missing Beginning Bracket", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        try {
+          parser.parse("\"name\":{\"first:\"sam\", \"last\":\"doe\" } }");
+        } catch (IOException ex) {
+          // expected
+        }
+      }
+    });
+
+    tests.add("Empty String", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        try {
+          parser.parse("");
+        } catch (IOException ex) {
+          // expected
+        }
+      }
+    });
+
+    tests.add("Object Value Missing Comma", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        try {
+          parser.parse("{ \"name\":{\"first\":\"sam\" \"last\":\"doe\" } }");
+        } catch (IOException ex) {
+          // expected
+        }
+      }
+    });
+
+    tests.add("Object Value Extra Whitespace", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        final JSON obj = parser.parse("{ \"name\":{\"first\":\"sam\", \"last\":\"doe\" } }   \t\n  ");
+
+        final JSON nameObj = obj.getObject("name");
+
+        Asserts.isNotNull(nameObj);
+        Asserts.isEqual("sam", nameObj.getString("first"));
+        Asserts.isEqual("doe", nameObj.getString("last"));
+      }
+    });
+
+    tests.add("Object With Empty String Key", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        final JSON obj = parser.parse("{ \"name\":{\"\":\"sam\", \"last\":\"doe\" } }");
+
+        final JSON nameObj = obj.getObject("name");
+
+        Asserts.isNotNull(nameObj);
+        Asserts.isEqual("sam", nameObj.getString(""));
+        Asserts.isEqual("doe", nameObj.getString("last"));
+      }
+    });
+
+    tests.add("Object With Empty String Value", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        final JSON obj = parser.parse("{ \"name\":{\"first\":\"\", \"last\":\"doe\" } }");
+
+        final JSON nameObj = obj.getObject("name");
+
+        Asserts.isNotNull(nameObj);
+        Asserts.isEqual("", nameObj.getString("first"));
+        Asserts.isEqual("doe", nameObj.getString("last"));
+      }
+    });
+
+
+    tests.add("Object Replace Value", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        final JSON obj = parser.parse("{ \"name\":{\"first\":\"sam\", \"first\":\"doe\" } }");
+
+        final JSON nameObj = obj.getObject("name");
+
+        Asserts.isNotNull(nameObj);
+        Asserts.isEqual("doe", nameObj.getString("first"));
+      }
+    });
+
+
+    tests.add("Object Value Escape Char", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        final JSON obj = parser.parse("{ \"name\":{\"first\":\"\\\"sam\\\"\", \"last\":\"\\\\doe\\t\\n\" } }");
+
+        final JSON nameObj = obj.getObject("name");
+
+        Asserts.isNotNull(nameObj);
+        Asserts.isEqual("\"sam\"", nameObj.getString("first"));
+        Asserts.isEqual("\\doe\t\n", nameObj.getString("last"));
       }
     });
 

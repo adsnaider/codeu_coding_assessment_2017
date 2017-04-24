@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+// WARNING: this class is not multithread safe.
 final class MyJSON implements JSON {
   private Map<String, String> strings = new HashMap<>();
   private Map<String, JSON> objects = new HashMap<>();
