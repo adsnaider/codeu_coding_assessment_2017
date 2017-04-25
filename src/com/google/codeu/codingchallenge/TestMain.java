@@ -239,6 +239,21 @@ final class TestMain {
       }
     });
 
+    tests.add("Object Value Replaced", new Test() {
+      @Override
+      public void run(JSONFactory factory) throws Exception {
+
+        final JSONParser parser = factory.parser();
+        final JSON obj = parser.parse("{ \"name\":{\"first\":\"sam\", \"last\":\"doe\" }, \"name\":\"sam\" }   \t\n  ");
+
+        final String nameStr = obj.getString("name");
+
+        Asserts.isNotNull(nameStr);
+        Asserts.isEqual("sam", nameStr);
+      }
+    });
+
+
     tests.add("Object With Empty String Key", new Test() {
       @Override
       public void run(JSONFactory factory) throws Exception {
@@ -274,13 +289,22 @@ final class TestMain {
       @Override
       public void run(JSONFactory factory) throws Exception {
 
-        final JSONParser parser = factory.parser();
-        final JSON obj = parser.parse("{ \"name\":{\"first\":\"sam\", \"first\":\"doe\" } }");
+        JSONParser parser = factory.parser();
+        JSON obj = parser.parse("{ \"name\":{\"first\":\"sam\", \"first\":\"doe\" } }");
 
         final JSON nameObj = obj.getObject("name");
 
         Asserts.isNotNull(nameObj);
         Asserts.isEqual("doe", nameObj.getString("first"));
+
+        parser = factory.parser();
+        obj = parser.parse("{ \"name\":{\"first\":\"sam\", \"last\":\"doe\" }, \"name\":\"sam\" }   \t\n  ");
+
+        final String nameStr = obj.getString("name");
+
+        Asserts.isNotNull(nameStr);
+        Asserts.isEqual("sam", nameStr);
+
       }
     });
 
